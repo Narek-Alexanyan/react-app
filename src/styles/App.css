@@ -1,0 +1,12 @@
+.sort_wrapper {
+  width: 150px;
+  max-width: 100%;
+  margin-top: 20px;
+}
+
+.posts_box {
+  padding: 20px 30px;
+}
+.posts_form {
+  margin: 20px 0;
+}
