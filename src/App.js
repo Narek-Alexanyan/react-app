@@ -1,82 +1,65 @@
 import "../src/styles/App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Posts from "./components/posts/Posts/Posts";
 import PostForm from "./components/posts/post-form/PostForm";
-import CustomSelect from "./components/UI/select/CustomSelect";
+import PostFilter from "./components/posts/post-filter/PostFilter";
+import CustomModal from "./components/UI/modals/CustomModal";
+import CustomButton from "./components/UI/Button/CustomButton";
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { usePosts } from "./hooks/usePosts";
+import axios from "axios";
 
 function App() {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "Javascript",
-      description: "language of programing",
-    },
-    {
-      id: 2,
-      title: "Python",
-      description: "language of programing 2",
-    },
-    {
-      id: 3,
-      title: "Java",
-      description: "language of programing 3",
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
 
-  const [selectedSort, setSelectedSort] = useState("");
+  const [filter, setFilter] = useState({ sort: '', search: '' });
 
-  const sortedPosts = getSortedPosts()
+  const [visible, setVisible] = useState(false)
 
-  function getSortedPosts() {
-    if (selectedSort) {
-      return [...posts].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
-    }
-    return posts
-  }
+  const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.search)
+
+  useEffect(() => {
+    fetchPosts()
+  }, []);
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
+    setVisible(false)
   };
 
   const removePost = (post) => {
     setPosts(posts.filter((item) => post.id !== item.id));
   };
 
-  const sortPosts = (sort) => {
-    setSelectedSort(sort);
-  };
+  async function fetchPosts() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/posts')
+
+    setPosts(response.data)
+  }
+
 
   return (
     <div className="App">
       <CssBaseline />
       <Container maxWidth="xl">
         <Box className="posts_box" sx={{ bgcolor: "#f8f8ff", height: "100vh" }}>
-          <div className="posts_form">
+          <CustomButton
+            onClick={() => setVisible(true)}
+            variant="outlined"
+            size="medium"
+            color="primary"
+            endIcon={<AddCircleOutlineIcon />}
+          >
+            Create post
+          </CustomButton>
+          <CustomModal visible={visible} setVisible={setVisible}>
             <PostForm create={createPost} />
-          </div>
-          <hr />
-          <div className="sort_wrapper">
-            <CustomSelect
-              value={selectedSort}
-              onChange={sortPosts}
-              label="sort"
-              defaultValue="sort of"
-              options={[
-                { value: "title", name: "of title" },
-                { value: "description", name: "of description" },
-              ]}
-            />
-          </div>
-          {posts.length ? (
-            <Posts remove={removePost} posts={sortedPosts} title="List of Posts 1" />
-          ) : (
-            <h2 style={{ textAlign: "center", padding: "15px 0" }}>
-              List is empty
-            </h2>
-          )}
+          </CustomModal>
+          <PostFilter filter={filter} setFilter={setFilter} />
+          <Posts remove={removePost} posts={sortedAndSearchedPosts} title="List of Posts 1" />
         </Box>
       </Container>
     </div>

@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 
 const CustomField = (props) => {
     return (
-        <TextField {...props} />
+        <TextField fullWidth {...props} />
     );
 }
 
