@@ -3,12 +3,16 @@ import React, { useContext } from "react";
 import CustomButton from "../components/UI/Button/CustomButton";
 import CustomField from "../components/UI/fields/CustomField";
 import { AuthContext } from "../context";
+import { useNavigate } from "react-router-dom";
+
 
 const Login = () => {
   const { isAuth, setIsAuth } = useContext(AuthContext);
+  const navigate = useNavigate()
   const login = (e) => {
     e.preventDefault();
     setIsAuth(true);
+    navigate('/posts')
   };
 
   return (
